@@ -5,7 +5,10 @@ from selenium.webdriver.chrome.options import Options
 import os
 import time
 import pandas as pd
+import yaml
 
+# load params
+ref=yaml.load(open('.\\params.yaml', 'r'), Loader=yaml.SafeLoader)
 
 # Initialize WebDriver
 options = Options()
@@ -13,7 +16,8 @@ options.headless = True  # Optional: Run headless (without UI)
 driver = webdriver.Chrome(options=options)
 
 # Open the page
-driver.get('https://www.pesobility.com/stock')
+sitepath=ref.get('urls').get('main')+ref.get('urls').get('subdir').get('stocks')
+driver.get(sitepath)
 time.sleep(10)
 
 # Get headers
@@ -54,10 +58,7 @@ stock_prices["load_datetime"]="{}-{:02d}-{:02d} {:02d}:{:02d}:{:02d}".format(
 print(time.localtime())
 
 # save to outpath
-# if not os.path.isdir("\web-scraping-1\outputs"):
-#     os.mkdir(os.getcwd()+"\\outputs")
-#     print("{} path created".format(os.getcwd()+"\\outputs"))
-outpath=".\\outputs\\stock_prices_historical.csv"
+outpath=ref.get("outpaths").get("raw")
 
 # outpath=os.path.dirname(os.getcwd())+"\\outputs\\stock_prices_historical.csv"
 stock_prices.to_csv(outpath,mode='a', header=False)

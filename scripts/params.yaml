@@ -1,0 +1,8 @@
+urls:
+  main: 'https://www.pesobility.com'
+  subdir:
+    stocks: '/stock' 
+    lotsize: '/ref/boardlot'
+outpaths:
+  raw: '.\outputs\stock_prices_historical.csv'
+  prepped: '.\outputs\stock_prices_prepped_{}{:02d}{:02d}{:02d}{:02d}.csv' 

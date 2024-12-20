@@ -5,7 +5,10 @@ from selenium.webdriver.chrome.options import Options
 import os
 import time
 import pandas as pd
+import yaml
 
+# load params
+ref=yaml.load(open('.\\params.yaml', 'r'), Loader=yaml.SafeLoader)
 
 # Initialize WebDriver
 options = Options()
@@ -13,7 +16,8 @@ options.headless = True  # Optional: Run headless (without UI)
 driver = webdriver.Chrome(options=options)
 
 # Open the page
-driver.get('https://www.pesobility.com/stock')
+sitepath=ref.get('urls').get('main')+ref.get('urls').get('subdir').get('stocks')
+driver.get(sitepath)
 time.sleep(10)
 
 # Get headers
@@ -28,7 +32,8 @@ headers_f=["ix"]+headers_f+["load_datetime"]
 driver.quit()
 
 # read raw
-raw=pd.read_csv(".\\outputs\\stock_prices_historical.csv", header=None)
+rawpath=ref.get("outpaths").get("raw")
+raw=pd.read_csv(rawpath, header=None)
 raw.columns=headers_f
 
 # format data
@@ -48,12 +53,13 @@ cleaned=raw.groupby(["load_date", "_symbol", "_name"]).agg(
     , rec_count=('_symbol', 'count')
 )
 
-cleaned.to_csv(".\\outputs\\stock_prices_prepped_{}{:02d}{:02d}{:02d}{:02d}.csv".format(
-    time.localtime().tm_year
-    , time.localtime().tm_mon
-    , time.localtime().tm_mday
-    , time.localtime().tm_hour
-    , time.localtime().tm_min
-    )
+cleaned.to_csv(
+    ref.get('outpaths').get('prepped').format(
+        time.localtime().tm_year
+        , time.localtime().tm_mon
+        , time.localtime().tm_mday
+        , time.localtime().tm_hour
+        , time.localtime().tm_min
+        )
     , index=False
 )
